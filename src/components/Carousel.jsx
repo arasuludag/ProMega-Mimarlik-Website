@@ -12,7 +12,7 @@ export default function ControlledCarousel(props) {
     var mapped = props.image.map((images) => {
       return (
         <Carousel.Item key = {props.key}>
-          <img key = {props.key} style = {{borderRadius: "4px", height: "500px", margin: "0 auto"}} className="d-block" src={images} alt={props.title} />
+          <img key = {props.key} style = {{borderRadius: "4px",  margin: "0 auto"}} className="d-block w-100" src={images} alt={props.title} />
 
         </Carousel.Item>
       )

@@ -56,7 +56,7 @@ export default function FullScreenDialog(props) {
             >
               <CloseIcon />
             </IconButton>
-            <Typography variant="h4" className={classes.title}>
+            <Typography variant="h5" className={classes.title}>
               {props.title}
             </Typography>
           </Toolbar>

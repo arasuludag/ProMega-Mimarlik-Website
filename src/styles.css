@@ -43,8 +43,9 @@ h1, h3 {
 }
 
 .carousel {
-  width: 700px;
-  margin: auto;
+  max-width: 100vh;
+  max-height: 100vh;
+  margin: 0 auto;
 }
 
 .Avatar {

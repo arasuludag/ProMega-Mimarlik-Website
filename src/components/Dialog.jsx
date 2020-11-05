@@ -1,18 +1,32 @@
-import React from 'react';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Slide from '@material-ui/core/Slide';
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import CloseIcon from "@material-ui/icons/Close";
+import Slide from "@material-ui/core/Slide";
 
-import Carousel from './Carousel.jsx'
+import Carousel from "./Carousel.jsx";
+
+const useStyles = makeStyles((theme) => ({
+  appBar: {
+    position: "relative",
+  },
+  title: {
+    marginLeft: theme.spacing(2),
+    flex: 1,
+  },
+}));
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertDialogSlide(props) {
+export default function FullScreenDialog(props) {
+  const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -24,33 +38,30 @@ export default function AlertDialogSlide(props) {
   };
 
   return (
-    <div key = {props.key}>
-      <Button onClick={handleClickOpen} key = {props.key}>
-        Daha Fazla
-      </Button>
+    <div>
+      <Button onClick={handleClickOpen}>Daha Fazla</Button>
       <Dialog
-        key = {props.key}
-        maxWidth="md"
+        fullScreen
         open={open}
-        scroll="paper"
-        TransitionComponent={Transition}
-        keepMounted
         onClose={handleClose}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
+        TransitionComponent={Transition}
       >
-        <DialogTitle id="alert-dialog-slide-title">{props.title}</DialogTitle>
-        <DialogContent key = {props.key}>
-          <Carousel
-            image = {props.image}
-            title = {props.title}
-            key = {props.key}/>
-        </DialogContent>
-        <DialogActions key = {props.key}>
-          <Button onClick={handleClose} key = {props.key}>
-            Kapat
-          </Button>
-        </DialogActions>
+        <AppBar className={classes.appBar} color="transparent">
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleClose}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography variant="h4" className={classes.title}>
+              {props.title}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Carousel image={props.image} title={props.title} key={props.key} />
       </Dialog>
     </div>
   );

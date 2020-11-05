@@ -31,7 +31,7 @@ export default function MediaCard(props) {
   const classes = useStyles();
 
   return (
-    <Grid item xs={5} lg={3}>
+    <Grid item xs={10} sm={6} lg={3}>
     <Card className={classes.root} key = {props.key}>
         <CardMedia
           className={classes.media}
@@ -54,7 +54,8 @@ export default function MediaCard(props) {
         <Dialog
           title={props.title}
           text={props.location}
-          image={props.image}/>
+          image={props.image}
+          key={props.key}/>
       </CardActions>
     </Card>
   </Grid>

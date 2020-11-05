@@ -6,7 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 
-import parse from 'html-react-parser';
+import parse from "html-react-parser";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -25,8 +25,11 @@ export default function AlertDialogSlide(props) {
 
   return (
     <div>
-      <Button onClick={handleClickOpen}>Daha Fazla</Button>
+      <Button key={props.key} onClick={handleClickOpen}>
+        Daha Fazla
+      </Button>
       <Dialog
+        key={props.key}
         open={open}
         TransitionComponent={Transition}
         keepMounted
@@ -36,11 +39,9 @@ export default function AlertDialogSlide(props) {
       >
         <DialogTitle id="alert-dialog-slide-title">{props.name}</DialogTitle>
         <DialogContent>
-          <p>
-            {parse(props.text)}
-          </p>
+          <p>{parse(props.text)}</p>
         </DialogContent>
-        <DialogActions>
+        <DialogActions key={props.key}>
           <Button onClick={handleClose}>Kapat</Button>
         </DialogActions>
       </Dialog>

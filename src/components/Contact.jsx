@@ -7,9 +7,9 @@ import PhoneIcon from "@material-ui/icons/Phone";
 import LocationCityIcon from "@material-ui/icons/LocationCity";
 import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
 
-import InstagramIcon from '@material-ui/icons/Instagram';
-import YouTubeIcon from '@material-ui/icons/YouTube';
-import FacebookIcon from '@material-ui/icons/Facebook';
+import InstagramIcon from "@material-ui/icons/Instagram";
+import YouTubeIcon from "@material-ui/icons/YouTube";
+import FacebookIcon from "@material-ui/icons/Facebook";
 
 import { Button } from "react-bootstrap";
 
@@ -51,13 +51,28 @@ function Contact() {
         <Grid item xs={10} sm={1} lg={1}>
           <Grid item container direction="column" spacing={2}>
             <Grid item>
-            <a style={{color: "black", textAlign: "right"}} href="https://www.facebook.com/promegamimarlik"><FacebookIcon /></a>
+              <a
+                style={{ color: "black", textAlign: "right" }}
+                href="https://www.facebook.com/promegamimarlik"
+              >
+                <FacebookIcon />
+              </a>
             </Grid>
             <Grid item>
-            <a style={{color: "black"}} href="https://www.youtube.com/channel/UCGsVTO-eYGpxqU4VjACuwaA"><YouTubeIcon /></a>
+              <a
+                style={{ color: "black" }}
+                href="https://www.youtube.com/channel/UCGsVTO-eYGpxqU4VjACuwaA"
+              >
+                <YouTubeIcon />
+              </a>
             </Grid>
             <Grid item>
-            <a style={{color: "black"}} href="https://www.instagram.com/promegamimarlik/"><InstagramIcon /></a>
+              <a
+                style={{ color: "black" }}
+                href="https://www.instagram.com/promegamimarlik/"
+              >
+                <InstagramIcon />
+              </a>
             </Grid>
           </Grid>
         </Grid>

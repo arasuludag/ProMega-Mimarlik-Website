@@ -1,0 +1,95 @@
+body {
+  background-color: #FBFBFB;
+}
+
+p {
+  color: #333333;
+}
+
+h1, h3 {
+  color: #B99C66;
+}
+
+.nav-link.active {
+  color: #B99C66!important;
+}
+
+.navbar-nav{
+    text-align: right;
+}
+
+.logo {
+  width: 250px;
+}
+
+.navbar {
+  border-bottom: 1px ridge white;
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+
+}
+
+.Squeezer {
+  max-width: 1366px;
+  margin: 0 auto;
+  padding: 150px 0;
+}
+
+.About {
+  max-width: 1100px;
+}
+
+.carousel {
+  width: 700px;
+  margin: auto;
+}
+
+.Avatar {
+  display: block;
+  width: 150px;
+  margin: 0 auto;
+  padding: 20px 0;
+  border-radius: 50%;
+}
+
+.PersonCard {
+  height: 500px;
+}
+
+.Hero {
+  background-image: url("HeroBG2.jpg");
+  height: 100vh;
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+}
+
+.HeroGrid {
+  height: 100vh;
+  margin: 0 auto;
+  width: 90%!important;
+}
+
+.ContactText {
+  text-align: center;
+  padding-bottom: 10px;
+  font-weight: 300;
+}
+
+.Projects {
+  margin: 80px auto;
+}
+
+.AboutPhoto {
+  float: right;
+  max-width: 500px;
+}
+
+@media only screen and (max-width: 1000px) {
+  .Projects {
+    margin: 150px auto;
+  }
+}

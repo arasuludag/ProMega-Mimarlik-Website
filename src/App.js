@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-
 import "./styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -15,19 +14,21 @@ function App() {
   return (
     <Router>
       <div className="App">
-
         <Switch>
           <Route exact path="/Referanslar">
-            <Header variant="light"/>
+            <Header variant="light" />
             <Referanslar />
           </Route>
           <Route exact path="/Projeler">
-            <Header variant="light"/>
+            <Header variant="light" />
             <Projeler />
           </Route>
-          <Route path="/">
-            <Header variant="dark"/>
+          <Route exact path="/">
+            <Header variant="dark" />
             <Home />
+          </Route>
+          <Route path="*">
+            <h1>404</h1>
           </Route>
         </Switch>
         <Footer />

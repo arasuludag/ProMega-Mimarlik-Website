@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Gallery from '../../components/Gallery.astro';
+import ProjectSlider from '../../components/ProjectSlider.astro';
 import RichText from '../../components/RichText.astro';
 import { getProjects, getProject } from '../../lib/queries';
 
@@ -37,7 +37,7 @@ const meta = [project.location, project.year].filter(Boolean).join(' · ');
         )
       }
 
-      <Gallery images={project.images} title={project.title} />
+      <ProjectSlider images={project.images} title={project.title} />
     </div>
   </article>
 </Base>

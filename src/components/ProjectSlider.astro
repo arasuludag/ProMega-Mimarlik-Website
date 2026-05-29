@@ -1,0 +1,185 @@
+---
+import SanityImage from './SanityImage.astro';
+import type { ImageWithMeta } from '../lib/image';
+
+interface Props {
+  images?: ImageWithMeta[];
+  title?: string;
+}
+const { images = [], title = '' } = Astro.props;
+if (images.length === 0) return;
+---
+
+<div class="ps-root" id="project-slider">
+  <!-- Main viewport -->
+  <div class="ps-viewport">
+    <div class="ps-container">
+      {images.map((img, i) => (
+        <div class="ps-slide">
+          <SanityImage
+            image={img}
+            alt={img.alt || `${title} ${i + 1}`}
+            maxWidth={2000}
+            sizes="(max-width: 900px) 100vw, 90vw"
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Arrows -->
+  {images.length > 1 && (
+    <>
+      <button class="ps-btn ps-prev" id="ps-prev" aria-label="Önceki görsel">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="ps-btn ps-next" id="ps-next" aria-label="Sonraki görsel">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </>
+  )}
+
+  <!-- Counter + dots -->
+  {images.length > 1 && (
+    <div class="ps-footer">
+      <span class="ps-counter" id="ps-counter">1 / {images.length}</span>
+      <div class="ps-dots" id="ps-dots">
+        {images.map((_, i) => (
+          <button class:list={['ps-dot', { active: i === 0 }]} data-index={i} aria-label={`Görsel ${i + 1}`} />
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
+<style>
+  .ps-root {
+    position: relative;
+    width: 100%;
+    user-select: none;
+  }
+  .ps-viewport {
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--bg-elevated);
+  }
+  .ps-container {
+    display: flex;
+    touch-action: pan-y pinch-zoom;
+  }
+  .ps-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    position: relative;
+  }
+  .ps-slide :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 72vh;
+    object-fit: contain;
+    background: #111;
+  }
+
+  /* Arrows */
+  .ps-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background: rgba(20, 20, 20, 0.65);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 2.2rem;
+    line-height: 1;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: background 0.25s var(--ease), transform 0.25s var(--ease), opacity 0.25s var(--ease);
+    opacity: 0.7;
+  }
+  .ps-btn:hover { background: rgba(40,40,40,0.9); opacity: 1; }
+  .ps-prev { left: 0.75rem; }
+  .ps-next { right: 0.75rem; }
+  .ps-prev:hover { transform: translateY(-50%) translateX(-2px); }
+  .ps-next:hover { transform: translateY(-50%) translateX(2px); }
+  .ps-btn:disabled { opacity: 0.2; cursor: default; }
+
+  /* Footer */
+  .ps-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+  .ps-counter {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    min-width: 3.5rem;
+    text-align: center;
+  }
+  .ps-dots {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .ps-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 0;
+    padding: 0;
+    background: var(--border);
+    cursor: pointer;
+    transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+  }
+  .ps-dot.active {
+    background: var(--text);
+    transform: scale(1.4);
+  }
+</style>
+
+<script>
+  import EmblaCarousel from 'embla-carousel';
+
+  const root = document.getElementById('project-slider');
+  const viewport = root?.querySelector('.ps-viewport') as HTMLElement | null;
+  if (!viewport) throw new Error();
+
+  const embla = EmblaCarousel(viewport, { loop: false, dragFree: false });
+
+  const counter = document.getElementById('ps-counter');
+  const dots = Array.from(document.querySelectorAll<HTMLButtonElement>('.ps-dot'));
+  const prevBtn = document.getElementById('ps-prev') as HTMLButtonElement | null;
+  const nextBtn = document.getElementById('ps-next') as HTMLButtonElement | null;
+  const total = embla.scrollSnapList().length;
+
+  const update = () => {
+    const i = embla.selectedScrollSnap();
+    if (counter) counter.textContent = `${i + 1} / ${total}`;
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+    if (prevBtn) prevBtn.disabled = !embla.canScrollPrev();
+    if (nextBtn) nextBtn.disabled = !embla.canScrollNext();
+  };
+
+  embla.on('select', update);
+  update();
+
+  prevBtn?.addEventListener('click', () => embla.scrollPrev());
+  nextBtn?.addEventListener('click', () => embla.scrollNext());
+  dots.forEach((d, i) => d.addEventListener('click', () => embla.scrollTo(i)));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') embla.scrollPrev();
+    else if (e.key === 'ArrowRight') embla.scrollNext();
+  });
+</script>

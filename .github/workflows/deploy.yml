@@ -42,6 +42,7 @@ jobs:
           # Active mode bypasses the passive port range problem on this cPanel server.
           lftp -e "
             set ftp:passive-mode false;
+            set ftp:ssl-allow false;
             set net:timeout 30;
             set net:max-retries 3;
             set net:reconnect-interval-base 5;

@@ -104,26 +104,39 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     </div>
   </section>
 
-  <!-- Team: circular photos -->
+  <!-- Team: circular photos + bio popup -->
   {
     team.length > 0 && (
       <section class="section pt0">
         <div class="container team-row">
-          {team.map((m) => (
+          {team.map((m, i) => (
             <div class="team-member reveal">
-              <div class="avatar">
-                {m.photo?.asset?.url && (
-                  <SanityImage
-                    image={m.photo}
-                    alt={m.name}
-                    sizes="160px"
-                    maxWidth={320}
-                    aspect={1}
-                  />
-                )}
-              </div>
+              <button class="avatar-btn" data-open={`hbio-${i}`} aria-label={`${m.name} biyografisi`}>
+                <div class="avatar">
+                  {m.photo?.asset?.url && (
+                    <SanityImage
+                      image={m.photo}
+                      alt={m.name}
+                      sizes="160px"
+                      maxWidth={320}
+                      aspect={1}
+                    />
+                  )}
+                </div>
+              </button>
               <p class="m-name">{m.name}</p>
               {m.jobTitle && <p class="m-role">{m.jobTitle.toUpperCase()}</p>}
+              <button class="more-btn" data-open={`hbio-${i}`}>Biyografi →</button>
+
+              <dialog class="bio-dialog" id={`hbio-${i}`}>
+                <button class="bio-close" data-close aria-label="Kapat">&times;</button>
+                <h2>{m.name}</h2>
+                {m.jobTitle && <p class="bio-role">{m.jobTitle}</p>}
+                {m.bio && m.bio.length > 0
+                  ? <RichText value={m.bio} />
+                  : <p style="color:var(--text-muted)">Biyografi yakında eklenecektir.</p>
+                }
+              </dialog>
             </div>
           ))}
         </div>
@@ -295,8 +308,62 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     font-weight: 700;
     letter-spacing: 0.1em;
     color: var(--text-muted);
-    margin: 0;
+    margin: 0 0 0.6rem;
   }
+  .avatar-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    border-radius: 50%;
+    transition: transform 0.3s var(--ease);
+  }
+  .avatar-btn:hover { transform: scale(1.05); }
+  .more-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    margin-top: 0.2rem;
+    transition: color 0.25s var(--ease);
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+  .more-btn:hover { color: var(--text); }
+  .bio-dialog {
+    max-width: 680px;
+    width: calc(100% - 2rem);
+    background: var(--bg-elevated);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    line-height: 1.8;
+  }
+  .bio-dialog::backdrop {
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(4px);
+  }
+  .bio-dialog h2 { font-weight: 300; margin-bottom: 0.2rem; }
+  .bio-role { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 1.2rem; }
+  .bio-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 1rem;
+    background: none;
+    border: 0;
+    color: var(--text-muted);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .bio-close:hover { color: var(--text); }
 
   /* References */
   .refs h2 {
@@ -374,3 +441,20 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const dlg = document.getElementById(btn.dataset.open!) as HTMLDialogElement | null;
+      dlg?.showModal();
+    });
+  });
+  document.querySelectorAll<HTMLDialogElement>('.bio-dialog').forEach((dlg) => {
+    dlg.querySelector('[data-close]')?.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => {
+      const r = dlg.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)
+        dlg.close();
+    });
+  });
+</script>

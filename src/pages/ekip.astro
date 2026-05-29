@@ -1,0 +1,179 @@
+---
+import Base from '../layouts/Base.astro';
+import RichText from '../components/RichText.astro';
+import SanityImage from '../components/SanityImage.astro';
+import { getTeam } from '../lib/queries';
+
+const team = await getTeam();
+---
+
+<Base title="Ekip" description="Promega Mimarlık ekibi.">
+  <section class="section">
+    <div class="container">
+      <header class="page-head reveal">
+        <p class="eyebrow">Tanışın</p>
+        <h1>Ekip</h1>
+      </header>
+
+      {
+        team.length > 0 ? (
+          <div class="grid">
+            {team.map((m, i) => (
+              <article class="member reveal">
+                <div class="photo">
+                  {m.photo?.asset?.url && (
+                    <SanityImage image={m.photo} alt={m.name} aspect={3 / 4} sizes="(max-width: 800px) 100vw, 33vw" maxWidth={900} />
+                  )}
+                </div>
+                <h3>{m.name}</h3>
+                {m.jobTitle && <p class="role">{m.jobTitle}</p>}
+                {m.bio && m.bio.length > 0 && (
+                  <button class="more-btn" data-open={`bio-${i}`}>
+                    Biyografi →
+                  </button>
+                )}
+
+                {m.bio && m.bio.length > 0 && (
+                  <dialog class="bio-dialog" id={`bio-${i}`}>
+                    <button class="bio-close" data-close aria-label="Kapat">
+                      &times;
+                    </button>
+                    <h2>{m.name}</h2>
+                    {m.jobTitle && <p class="role">{m.jobTitle}</p>}
+                    <RichText value={m.bio} />
+                  </dialog>
+                )}
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p class="muted">Ekip bilgileri yakında eklenecektir.</p>
+        )
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-head {
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .photo {
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--bg-elevated);
+    aspect-ratio: 3 / 4;
+    margin-bottom: 1.1rem;
+  }
+  .photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.25);
+    transition: transform 0.6s var(--ease), filter 0.4s var(--ease);
+  }
+  .member:hover .photo :global(img) {
+    transform: scale(1.04);
+    filter: grayscale(0);
+  }
+  .member h3 {
+    font-size: 1.35rem;
+    font-weight: 300;
+    margin: 0 0 0.2rem;
+  }
+  .role {
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    font-size: 0.92rem;
+    margin: 0 0 0.8rem;
+  }
+  .more-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.9rem;
+    letter-spacing: 0.06em;
+    opacity: 0.8;
+    transition: opacity 0.25s var(--ease);
+  }
+  .more-btn:hover {
+    opacity: 1;
+  }
+
+  .bio-dialog {
+    max-width: 680px;
+    width: calc(100% - 2rem);
+    background: var(--bg-elevated);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    line-height: 1.8;
+  }
+  .bio-dialog::backdrop {
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(4px);
+  }
+  .bio-dialog h2 {
+    font-weight: 300;
+    margin-bottom: 0.2rem;
+  }
+  .bio-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 1rem;
+    background: none;
+    border: 0;
+    color: var(--text-muted);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .bio-close:hover {
+    color: var(--text);
+  }
+  .muted {
+    color: var(--text-muted);
+  }
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.open!;
+      const dlg = document.getElementById(id) as HTMLDialogElement | null;
+      dlg?.showModal();
+    });
+  });
+  document.querySelectorAll<HTMLDialogElement>('.bio-dialog').forEach((dlg) => {
+    dlg.querySelector('[data-close]')?.addEventListener('click', () => dlg.close());
+    // Close when clicking the backdrop (outside the dialog box).
+    dlg.addEventListener('click', (e) => {
+      const r = dlg.getBoundingClientRect();
+      if (
+        e.clientX < r.left ||
+        e.clientX > r.right ||
+        e.clientY < r.top ||
+        e.clientY > r.bottom
+      )
+        dlg.close();
+    });
+  });
+</script>

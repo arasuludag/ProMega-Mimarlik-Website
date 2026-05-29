@@ -1,0 +1,182 @@
+---
+import SanityImage from './SanityImage.astro';
+import type { ImageWithMeta } from '../lib/image';
+
+interface Props {
+  images?: ImageWithMeta[];
+  title?: string;
+}
+const { images = [], title = '' } = Astro.props;
+---
+
+<div class="gallery" id="gallery">
+  {
+    images.map((img, i) => (
+      <button class="g-item reveal" data-index={i} aria-label={`Görseli büyüt ${i + 1}`}>
+        <SanityImage
+          image={img}
+          alt={img.alt || `${title} ${i + 1}`}
+          maxWidth={1600}
+          sizes="(max-width: 760px) 100vw, 50vw"
+          loading={i < 2 ? 'eager' : 'lazy'}
+        />
+      </button>
+    ))
+  }
+</div>
+
+<div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true">
+  <button class="lb-close" aria-label="Kapat" data-lb="close">&times;</button>
+  <button class="lb-nav lb-prev" aria-label="Önceki" data-lb="prev">&#8249;</button>
+  <img class="lb-img" id="lb-img" alt="" />
+  <button class="lb-nav lb-next" aria-label="Sonraki" data-lb="next">&#8250;</button>
+  <div class="lb-counter" id="lb-counter"></div>
+</div>
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+  }
+  .g-item {
+    padding: 0;
+    border: 0;
+    margin: 0;
+    cursor: zoom-in;
+    background: var(--bg-elevated);
+    overflow: hidden;
+    border-radius: 4px;
+    display: block;
+  }
+  .g-item :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s var(--ease), opacity 0.4s var(--ease);
+  }
+  .g-item:hover :global(img) {
+    transform: scale(1.04);
+    opacity: 0.92;
+  }
+  @media (max-width: 620px) {
+    .gallery {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(12, 12, 12, 0.96);
+    backdrop-filter: blur(4px);
+  }
+  .lightbox.open {
+    display: flex;
+  }
+  .lb-img {
+    max-width: 92vw;
+    max-height: 86vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  }
+  .lb-close,
+  .lb-nav {
+    position: absolute;
+    background: none;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+  }
+  .lb-close:hover,
+  .lb-nav:hover {
+    opacity: 1;
+  }
+  .lb-close {
+    top: 1rem;
+    right: 1.4rem;
+    font-size: 2.6rem;
+    line-height: 1;
+  }
+  .lb-nav {
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3.5rem;
+    line-height: 1;
+    padding: 0 1.2rem;
+  }
+  .lb-prev {
+    left: 0.5rem;
+  }
+  .lb-next {
+    right: 0.5rem;
+  }
+  .lb-nav:hover {
+    transform: translateY(-50%) scale(1.1);
+  }
+  .lb-counter {
+    position: absolute;
+    bottom: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+  }
+</style>
+
+<script>
+  const gallery = document.getElementById('gallery');
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img') as HTMLImageElement | null;
+  const counter = document.getElementById('lb-counter');
+  if (gallery && lb && lbImg) {
+    const items = Array.from(gallery.querySelectorAll<HTMLButtonElement>('.g-item'));
+    const imgs = items.map((it) => it.querySelector('img') as HTMLImageElement);
+    let current = 0;
+
+    const show = (i: number) => {
+      current = (i + imgs.length) % imgs.length;
+      const src = imgs[current];
+      lbImg.src = src.currentSrc || src.src;
+      if (src.srcset) lbImg.srcset = src.srcset;
+      lbImg.sizes = '92vw';
+      lbImg.alt = src.alt;
+      if (counter) counter.textContent = `${current + 1} / ${imgs.length}`;
+    };
+    const open = (i: number) => {
+      show(i);
+      lb.classList.add('open');
+      lb.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+    const close = () => {
+      lb.classList.remove('open');
+      lb.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    items.forEach((it, i) => it.addEventListener('click', () => open(i)));
+    lb.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const action = t.dataset.lb;
+      if (action === 'close' || t === lb) close();
+      else if (action === 'prev') show(current - 1);
+      else if (action === 'next') show(current + 1);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') show(current - 1);
+      else if (e.key === 'ArrowRight') show(current + 1);
+    });
+  }
+</script>

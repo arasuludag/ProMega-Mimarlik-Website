@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Sayfa Bulunamadı">
+  <section class="section">
+    <div class="container center">
+      <p class="code">404</p>
+      <h1>Sayfa bulunamadı</h1>
+      <p class="sub">Aradığınız sayfa taşınmış ya da silinmiş olabilir.</p>
+      <a href="/" class="btn">Ana Sayfaya Dön</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .center { text-align: center; padding-block: 6rem; }
+  .code {
+    font-size: clamp(5rem, 16vw, 10rem);
+    font-weight: 100;
+    line-height: 1;
+    margin: 0 0 0.2em;
+    color: var(--text-muted);
+    opacity: 0.3;
+  }
+  h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 0.5rem; }
+  .sub { color: var(--text-muted); margin-bottom: 2rem; }
+  .btn {
+    display: inline-block;
+    padding: 0.85rem 1.8rem;
+    border: 1px solid var(--text);
+    border-radius: 2px;
+    font-size: 0.85rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition: background 0.3s var(--ease), color 0.3s var(--ease);
+  }
+  .btn:hover { background: var(--text); color: var(--bg); }
+</style>

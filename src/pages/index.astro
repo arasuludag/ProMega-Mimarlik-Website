@@ -1,0 +1,376 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroSlider from '../components/HeroSlider.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import SanityImage from '../components/SanityImage.astro';
+import RichText from '../components/RichText.astro';
+import { getSiteSettings, getProjects, getReferenceLogos, getAboutPage, getTeam } from '../lib/queries';
+
+const settings = await getSiteSettings();
+const allProjects = await getProjects();
+const logos = await getReferenceLogos();
+const about = await getAboutPage();
+const team = await getTeam();
+
+const featured = allProjects.filter((p) => p.featured);
+const showcase = (featured.length ? featured : allProjects).slice(0, 4);
+
+const sloganLines = settings.sloganLines?.length
+  ? settings.sloganLines
+  : ['Mimarlık · Mühendislik', '& İç Mimarlık'];
+
+const introImage = about.images?.[0];
+const aboutImage = about.images?.[1] ?? about.images?.[0];
+---
+
+<Base transparentHeader>
+  <HeroSlider images={settings.heroImages} sloganLines={sloganLines} />
+
+  <div class="section-divider"><span>PROMEGA</span></div>
+
+  <!-- Services / intro: image left + text right -->
+  <section class="section">
+    <div class="container two-col reveal">
+      <div class="col-media">
+        {introImage ? (
+          <SanityImage
+            image={introImage}
+            alt="Promega Mimarlık"
+            sizes="(max-width: 900px) 100vw, 45vw"
+            maxWidth={1200}
+          />
+        ) : (
+          <div class="placeholder">RESİM GELECEK!</div>
+        )}
+      </div>
+      <div class="col-text">
+        <p>
+          1990'dan bu yana mimarlık, mühendislik ve iç mimarlık alanlarında özgün,
+          estetik ve yaşanabilir projeler üretiyoruz.
+        </p>
+        <a class="btn" href="/projeler">Projeleri İncele</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"><span>PROMEGA</span></div>
+
+  <!-- Projects -->
+  {
+    showcase.length > 0 && (
+      <section class="section">
+        <div class="container">
+          <div class="row-head reveal">
+            <h2>Projeler</h2>
+            <a class="link-more" href="/projeler">
+              Daha Fazla →
+            </a>
+          </div>
+          <div class="proj-grid">
+            {showcase.map((p) => (
+              <ProjectCard project={p} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <div class="section-divider"><span>PROMEGA</span></div>
+
+  <!-- Hakkımızda: image left + title/text right -->
+  <section class="section">
+    <div class="container two-col reveal">
+      <div class="col-media">
+        {aboutImage ? (
+          <SanityImage
+            image={aboutImage}
+            alt="Hakkımızda"
+            sizes="(max-width: 900px) 100vw, 45vw"
+            maxWidth={1200}
+          />
+        ) : (
+          <div class="placeholder">RESİM GELECEK!</div>
+        )}
+      </div>
+      <div class="col-text">
+        <h2>{about.heading || 'Hakkımızda'}</h2>
+        {about.body && about.body.length > 0 ? (
+          <RichText value={about.body} />
+        ) : (
+          <p class="muted">Hakkımızda yazısı gelecek!</p>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- Team: circular photos -->
+  {
+    team.length > 0 && (
+      <section class="section pt0">
+        <div class="container team-row">
+          {team.map((m) => (
+            <div class="team-member reveal">
+              <div class="avatar">
+                {m.photo?.asset?.url && (
+                  <SanityImage
+                    image={m.photo}
+                    alt={m.name}
+                    sizes="160px"
+                    maxWidth={320}
+                    aspect={1}
+                  />
+                )}
+              </div>
+              <p class="m-name">{m.name}</p>
+              {m.jobTitle && <p class="m-role">{m.jobTitle.toUpperCase()}</p>}
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {logos.length > 0 && <div class="section-divider"><span>PROMEGA</span></div>}
+
+  <!-- References: static logo grid -->
+  {
+    logos.length > 0 && (
+      <section class="section refs">
+        <div class="container">
+          <h2 class="reveal">Referanslar</h2>
+          <div class="logo-grid">
+            {logos.map((l) => (
+              <div class="logo-tile reveal">
+                {l.link ? (
+                  <a href={l.link} target="_blank" rel="noopener" title={l.name}>
+                    <SanityImage image={l.logo} alt={l.name} maxWidth={300} sizes="150px" />
+                  </a>
+                ) : (
+                  <div title={l.name}>
+                    <SanityImage image={l.logo} alt={l.name} maxWidth={300} sizes="150px" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  /* Section divider: ─── PROMEGA ─── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .section-divider::before,
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-divider span {
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* Two-column split */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .col-media :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+  .placeholder {
+    aspect-ratio: 4 / 3;
+    background: var(--bg-elevated-2);
+    display: grid;
+    place-items: center;
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+  }
+  .col-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .col-text p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    line-height: 1.8;
+    margin: 0;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.85rem 1.8rem;
+    border: 1px solid var(--text);
+    border-radius: 2px;
+    font-size: 0.85rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition:
+      background 0.3s var(--ease),
+      color 0.3s var(--ease);
+    align-self: flex-start;
+  }
+  .btn:hover {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  /* Projects */
+  .row-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .link-more {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    transition: color 0.25s var(--ease);
+  }
+  .link-more:hover {
+    color: var(--text);
+  }
+  .proj-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+
+  /* Team */
+  .pt0 {
+    padding-top: 0;
+  }
+  .team-row {
+    display: flex;
+    justify-content: center;
+    gap: clamp(2rem, 5vw, 5rem);
+    flex-wrap: wrap;
+  }
+  .team-member {
+    text-align: center;
+  }
+  .avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--bg-elevated-2);
+    margin: 0 auto 1rem;
+  }
+  .avatar :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .m-name {
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.25rem;
+    color: var(--text);
+  }
+  .m-role {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* References */
+  .refs h2 {
+    margin-bottom: 2rem;
+  }
+  .logo-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .logo-tile {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem 1.5rem;
+    aspect-ratio: 2 / 1;
+    transition: border-color 0.25s var(--ease);
+  }
+  .logo-tile a,
+  .logo-tile > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+  .logo-tile :global(img) {
+    max-width: 100%;
+    max-height: 56px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: grayscale(1) brightness(2);
+    opacity: 0.7;
+    transition:
+      opacity 0.3s var(--ease),
+      filter 0.3s var(--ease);
+    background: none !important;
+  }
+  .logo-tile:hover {
+    border-color: var(--text-muted);
+  }
+  .logo-tile:hover :global(img) {
+    opacity: 1;
+    filter: grayscale(0);
+  }
+
+  .muted {
+    color: var(--text-muted);
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .proj-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .logo-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 900px) {
+    .two-col {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 640px) {
+    .proj-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .logo-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

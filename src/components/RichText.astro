@@ -1,0 +1,53 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { PortableBlock } from '../lib/queries';
+
+interface Props {
+  value?: PortableBlock[];
+  class?: string;
+}
+
+const { value, class: className } = Astro.props;
+---
+
+{
+  value && value.length > 0 && (
+    <div class:list={['rich-text', className]}>
+      <PortableText value={value as any} />
+    </div>
+  )
+}
+
+<style>
+  .rich-text :global(p) {
+    margin: 0 0 1.1em;
+    line-height: 1.8;
+  }
+  .rich-text :global(h2) {
+    font-weight: 300;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    margin: 1.6em 0 0.6em;
+  }
+  .rich-text :global(h3) {
+    font-weight: 300;
+    font-size: 1.2rem;
+    margin: 1.4em 0 0.5em;
+  }
+  .rich-text :global(a) {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .rich-text :global(ul),
+  .rich-text :global(ol) {
+    margin: 0 0 1.1em;
+    padding-left: 1.2em;
+    line-height: 1.8;
+  }
+  .rich-text :global(blockquote) {
+    margin: 1.4em 0;
+    padding-left: 1em;
+    border-left: 2px solid #444;
+    color: #bdbdbd;
+  }
+</style>

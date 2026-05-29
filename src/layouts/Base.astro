@@ -1,0 +1,79 @@
+---
+import '@fontsource/roboto/100.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/700.css';
+import '../styles/global.css';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getSiteSettings } from '../lib/queries';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Header sits transparently over a hero (home page). */
+  transparentHeader?: boolean;
+}
+
+const { title, description, transparentHeader = false } = Astro.props;
+
+const settings = await getSiteSettings();
+
+const siteName = 'Promega Mimarlık';
+const pageTitle = title ? `${title} | ${siteName}` : settings.seo?.title || siteName;
+const pageDesc =
+  description ||
+  settings.seo?.description ||
+  'Promega Mimarlık — Mimarlık, Mühendislik ve İç Mimarlık. Samsun.';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#1b1b1b" />
+  </head>
+  <body>
+    <Header settings={settings} transparent={transparentHeader} />
+    <main>
+      <slot />
+    </main>
+    <Footer settings={settings} />
+
+    <script>
+      // Subtle scroll-reveal for elements with .reveal
+      const els = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && els.length) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -10% 0px', threshold: 0.05 },
+        );
+        els.forEach((el) => io.observe(el));
+      } else {
+        els.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+import Gallery from '../../components/Gallery.astro';
+import RichText from '../../components/RichText.astro';
+import { getProjects, getProject } from '../../lib/queries';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((p) => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+const project = await getProject(slug!);
+if (!project) return Astro.redirect('/projeler');
+
+const meta = [project.location, project.year].filter(Boolean).join(' · ');
+---
+
+<Base title={project.title} description={`${project.title}${meta ? ' — ' + meta : ''}`}>
+  <article class="section">
+    <div class="container">
+      <a href="/projeler" class="back reveal">← Projeler</a>
+
+      <header class="head reveal">
+        <h1>{project.title}</h1>
+        <div class="meta">
+          {project.location && <span>{project.location}</span>}
+          {project.year && <span>{project.year}</span>}
+        </div>
+      </header>
+
+      {
+        project.description && project.description.length > 0 && (
+          <div class="desc reveal">
+            <RichText value={project.description} />
+          </div>
+        )
+      }
+
+      <Gallery images={project.images} title={project.title} />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .back {
+    display: inline-block;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 1.5rem;
+    transition: color 0.25s var(--ease);
+  }
+  .back:hover {
+    color: var(--text);
+  }
+  .head {
+    margin-bottom: 2rem;
+  }
+  .meta {
+    display: flex;
+    gap: 1.2rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    font-size: 0.95rem;
+  }
+  .meta span {
+    position: relative;
+  }
+  .meta span + span::before {
+    content: '·';
+    position: absolute;
+    left: -0.75rem;
+  }
+  .desc {
+    max-width: 70ch;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+    color: var(--text-muted);
+  }
+</style>

@@ -33,14 +33,16 @@ jobs:
           PUBLIC_SANITY_PROJECT_ID: ${{ secrets.PUBLIC_SANITY_PROJECT_ID }}
           PUBLIC_SANITY_DATASET: production
 
-      - name: Deploy to cPanel via FTP
+      - name: Deploy to cPanel via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: 185.149.100.26
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          # ftps-legacy = explicit TLS on port 21 (what cPanel supports).
+          # Plain FTP causes ECONNRESET from GitHub Actions due to passive mode.
+          protocol: ftps-legacy
+          port: 21
           local-dir: ./dist/
           server-dir: /public_html/
-          # Removes old CRA files that no longer exist in dist/.
-          # Safe after the first deploy since all files are Astro-managed.
           dangerous-clean-slate: false

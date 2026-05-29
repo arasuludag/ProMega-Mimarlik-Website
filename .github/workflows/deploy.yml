@@ -47,7 +47,7 @@ jobs:
             set net:max-retries 3;
             set net:reconnect-interval-base 5;
             open ftp://185.149.100.26;
-            user \$FTP_USER \$FTP_PASS;
+            user $FTP_USER $FTP_PASS;
             mirror --reverse --delete --verbose=1 --exclude='.ftp-deploy-sync-state.json' ./dist/ /public_html/;
             quit
           " 2>&1

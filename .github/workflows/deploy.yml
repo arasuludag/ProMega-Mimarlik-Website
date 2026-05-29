@@ -24,6 +24,12 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Cache Astro image builds
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.astro
+          key: astro-images-${{ secrets.PUBLIC_SANITY_PROJECT_ID }}
+
       - name: Install dependencies
         run: npm ci
 

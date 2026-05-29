@@ -33,16 +33,19 @@ jobs:
           PUBLIC_SANITY_PROJECT_ID: ${{ secrets.PUBLIC_SANITY_PROJECT_ID }}
           PUBLIC_SANITY_DATASET: production
 
-      - name: Deploy to cPanel via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: 185.149.100.26
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          # ftps-legacy = explicit TLS on port 21 (what cPanel supports).
-          # Plain FTP causes ECONNRESET from GitHub Actions due to passive mode.
-          protocol: ftps-legacy
-          port: 21
-          local-dir: ./dist/
-          server-dir: /public_html/
-          dangerous-clean-slate: false
+      - name: Deploy to cPanel via FTP (active mode)
+        env:
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          # Active mode bypasses the passive port range problem on this cPanel server.
+          lftp -e "
+            set ftp:passive-mode false;
+            set net:timeout 30;
+            set net:max-retries 3;
+            set net:reconnect-interval-base 5;
+            open ftp://185.149.100.26;
+            user \$FTP_USER \$FTP_PASS;
+            mirror --reverse --delete --verbose=1 --exclude='.ftp-deploy-sync-state.json' ./dist/ /public_html/;
+            quit
+          " 2>&1

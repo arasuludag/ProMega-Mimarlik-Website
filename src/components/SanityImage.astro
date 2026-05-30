@@ -28,14 +28,19 @@ const {
 const dims = image?.asset?.metadata?.dimensions;
 const lqip = image?.asset?.metadata?.lqip;
 
+// An image field can exist with a null/empty asset (e.g. added in the Studio
+// then cleared). Only build a URL when there's a real asset to point at —
+// otherwise urlFor() throws reading `_ref` off null and breaks the whole build.
+const hasAsset = Boolean(image?.asset?._ref || image?.asset?.url);
+
 // Build a high-res source; Astro downscales it for the srcset at build time.
-let builder = image ? urlFor(image).width(maxWidth).auto('format') : null;
+let builder = hasAsset ? urlFor(image!).width(maxWidth).auto('format') : null;
 let width = maxWidth;
 let height = dims ? Math.round(maxWidth / dims.aspectRatio) : Math.round(maxWidth * 0.75);
 
-if (image && aspect) {
+if (hasAsset && aspect) {
   height = Math.round(maxWidth / aspect);
-  builder = urlFor(image).width(maxWidth).height(height).fit('crop').auto('format');
+  builder = urlFor(image!).width(maxWidth).height(height).fit('crop').auto('format');
 }
 
 const src = builder?.url();

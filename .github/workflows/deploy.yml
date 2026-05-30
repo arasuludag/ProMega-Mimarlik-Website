@@ -58,6 +58,6 @@ jobs:
             set mirror:use-pget-n 4;
             open ftp://185.149.100.26;
             user $FTP_USER $FTP_PASS;
-            mirror --reverse --delete --verbose=1 --exclude='.ftp-deploy-sync-state.json' ./dist/ /public_html/;
+            mirror --reverse --delete --size-only --verbose=1 --exclude='.ftp-deploy-sync-state.json' ./dist/ /public_html/;
             quit
           " 2>&1

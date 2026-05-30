@@ -35,6 +35,12 @@ export interface SiteSettings {
   logo?: ImageWithMeta;
   sloganLines?: string[];
   heroImages?: ImageWithMeta[];
+  homeIntro?: {
+    image?: ImageWithMeta;
+    text?: string;
+    buttonLabel?: string;
+    buttonLink?: string;
+  };
   contact?: { email?: string; phone?: string; address?: string };
   social?: { facebook?: string; instagram?: string; youtube?: string };
   footerText?: string;
@@ -94,6 +100,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       logo ${IMG},
       sloganLines,
       heroImages[] ${IMG},
+      homeIntro{ image ${IMG}, text, buttonLabel, buttonLink },
       contact, social, footerText, seo
     }`,
     {},

@@ -12,6 +12,9 @@ interface Props {
   /** Force an output aspect ratio (e.g. 4/3). Crops via Sanity. */
   aspect?: number;
   maxWidth?: number;
+  /** Skip the blurry LQIP background — use for transparent logos/icons so the
+   *  blur doesn't bleed through and create a glowing halo. */
+  plain?: boolean;
 }
 
 const {
@@ -23,6 +26,7 @@ const {
   loading = 'lazy',
   aspect,
   maxWidth = 2000,
+  plain = false,
 } = Astro.props;
 
 const dims = image?.asset?.metadata?.dimensions;
@@ -58,7 +62,7 @@ const altText = alt ?? image?.alt ?? '';
       sizes={sizes}
       loading={loading}
       class={className}
-      style={lqip ? `background-image:url(${lqip});background-size:cover;background-position:center;` : undefined}
+      style={lqip && !plain ? `background-image:url(${lqip});background-size:cover;background-position:center;` : undefined}
     />
   )
 }

@@ -1,5 +1,6 @@
 ---
 import type { SiteSettings } from '../lib/queries';
+import SanityImage from './SanityImage.astro';
 
 interface Props {
   settings: SiteSettings;
@@ -13,7 +14,15 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="container grid">
     <div class="col">
-      <span class="wordmark">PROMEGA<span class="thin"> MİMARLIK</span></span>
+      {
+        settings.logo?.asset?.url ? (
+          <a href="/" class="footer-brand" aria-label="Promega Mimarlık">
+            <SanityImage image={settings.logo} alt="Promega Mimarlık" class="footer-logo" maxWidth={320} plain />
+          </a>
+        ) : (
+          <span class="wordmark">PROMEGA<span class="thin"> MİMARLIK</span></span>
+        )
+      }
       {settings.footerText && <p class="muted">{settings.footerText}</p>}
     </div>
 
@@ -68,6 +77,16 @@ const year = new Date().getFullYear();
     grid-template-columns: 1.4fr 1fr 1fr;
     gap: 2.5rem;
     padding-bottom: 3rem;
+  }
+  .footer-brand {
+    display: inline-block;
+    margin-bottom: 0.4rem;
+  }
+  .footer-logo {
+    height: 42px;
+    width: auto;
+    object-fit: contain;
+    background: none !important;
   }
   .wordmark {
     font-size: 1.2rem;

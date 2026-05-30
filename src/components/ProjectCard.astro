@@ -81,6 +81,13 @@ const cover = project.images?.[0];
   .card:hover .view {
     transform: none;
   }
+  .card-title {
+    transition: color 0.3s var(--ease);
+  }
+  .card:hover .card-title,
+  .card:focus-visible .card-title {
+    color: var(--accent);
+  }
   .card-body {
     padding: 1rem 0.1rem 0;
   }

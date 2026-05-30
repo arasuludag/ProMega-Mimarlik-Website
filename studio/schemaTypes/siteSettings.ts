@@ -7,6 +7,7 @@ export default defineType({
   groups: [
     { name: 'general', title: 'Genel', default: true },
     { name: 'hero', title: 'Ana Sayfa Hero' },
+    { name: 'home', title: 'Ana Sayfa Tanıtım' },
     { name: 'contact', title: 'İletişim' },
     { name: 'seo', title: 'SEO' },
   ],
@@ -29,7 +30,8 @@ export default defineType({
     defineField({
       name: 'heroImages',
       title: 'Hero Slayt Görselleri',
-      description: 'Ana sayfanın en üstünde sırayla geçecek görseller.',
+      description:
+        'Ana sayfanın en üstünde sırayla geçecek görseller. Önerilen ölçü: 2400 × 1350 piksel (16:9 yatay). En az 1920 × 1080 olmalı.',
       type: 'array',
       group: 'hero',
       of: [
@@ -40,6 +42,40 @@ export default defineType({
             defineField({ name: 'alt', title: 'Alternatif Metin', type: 'string' }),
           ],
         },
+      ],
+    }),
+    defineField({
+      name: 'homeIntro',
+      title: 'Ana Sayfa Tanıtım Bölümü',
+      description: 'Ana sayfada hero altındaki görsel + yazı bölümü.',
+      type: 'object',
+      group: 'home',
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        defineField({
+          name: 'image',
+          title: 'Görsel',
+          type: 'image',
+          options: { hotspot: true },
+        }),
+        defineField({
+          name: 'text',
+          title: 'Yazı',
+          type: 'text',
+          rows: 4,
+        }),
+        defineField({
+          name: 'buttonLabel',
+          title: 'Buton Metni',
+          type: 'string',
+          description: 'Boş bırakılırsa "Projeleri İncele" kullanılır.',
+        }),
+        defineField({
+          name: 'buttonLink',
+          title: 'Buton Bağlantısı',
+          type: 'string',
+          description: 'Örn: /projeler veya /hizmetler. Boş bırakılırsa /projeler.',
+        }),
       ],
     }),
     defineField({

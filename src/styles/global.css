@@ -5,7 +5,8 @@
   --text: #ececec;
   --text-muted: #a6a6a6;
   --border: #383838;
-  --accent: #ffffff;
+  /* Restrained warm-bronze accent — used only on hover/active interaction */
+  --accent: #c2a877;
   --maxw: 1280px;
   --gutter: clamp(1.25rem, 5vw, 4rem);
   --header-h: 76px;

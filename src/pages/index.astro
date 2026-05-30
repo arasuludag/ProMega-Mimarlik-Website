@@ -19,12 +19,44 @@ const sloganLines = settings.sloganLines?.length
   ? settings.sloganLines
   : ['Mimarlık · Mühendislik', '& İç Mimarlık'];
 
-const introImage = about.images?.[0];
+const intro = settings.homeIntro ?? {};
+const introImage = intro.image ?? about.images?.[0];
+const introText =
+  intro.text ??
+  "1990'dan bu yana mimarlık, mühendislik ve iç mimarlık alanlarında özgün, estetik ve yaşanabilir projeler üretiyoruz.";
+const introBtnLabel = intro.buttonLabel || 'Projeleri İncele';
+const introBtnLink = intro.buttonLink || '/projeler';
 const aboutImage = about.images?.[1] ?? about.images?.[0];
 ---
 
 <Base transparentHeader>
   <HeroSlider images={settings.heroImages} sloganLines={sloganLines} />
+
+  <!-- References: slow marquee just under the hero -->
+  {
+    logos.length > 0 && (
+      <section class="refs-marquee" aria-label="Referanslar">
+        <span class="refs-label">Referanslar</span>
+        <div class="marquee">
+          <div class="marquee-track">
+            {[...logos, ...logos].map((l, i) => (
+              <div class="marquee-item" aria-hidden={i >= logos.length ? 'true' : undefined}>
+                {l.link ? (
+                  <a href={l.link} target="_blank" rel="noopener" title={l.name}>
+                    <SanityImage image={l.logo} alt={l.name} maxWidth={300} sizes="160px" plain />
+                  </a>
+                ) : (
+                  <div title={l.name}>
+                    <SanityImage image={l.logo} alt={l.name} maxWidth={300} sizes="160px" plain />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <div class="section-divider"><span>PROMEGA</span></div>
 
@@ -44,16 +76,13 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
         )}
       </div>
       <div class="col-text">
-        <p>
-          1990'dan bu yana mimarlık, mühendislik ve iç mimarlık alanlarında özgün,
-          estetik ve yaşanabilir projeler üretiyoruz.
-        </p>
-        <a class="btn" href="/projeler">Projeleri İncele</a>
+        <p>{introText}</p>
+        <a class="btn" href={introBtnLink}>{introBtnLabel}</a>
       </div>
     </div>
   </section>
 
-  <div class="section-divider"><span>PROMEGA</span></div>
+  <div class="container"><hr class="rule" /></div>
 
   <!-- Projects -->
   {
@@ -76,7 +105,7 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     )
   }
 
-  <div class="section-divider"><span>PROMEGA</span></div>
+  <div class="container"><hr class="rule" /></div>
 
   <!-- Hakkımızda: image left + title/text right -->
   <section class="section">
@@ -125,7 +154,7 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
                 </div>
               </button>
               <p class="m-name">{m.name}</p>
-              {m.jobTitle && <p class="m-role">{m.jobTitle.toUpperCase()}</p>}
+              {m.jobTitle && <p class="m-role">{m.jobTitle.toLocaleUpperCase('tr-TR')}</p>}
               <button class="more-btn" data-open={`hbio-${i}`}>Biyografi →</button>
 
               <dialog class="bio-dialog" id={`hbio-${i}`}>
@@ -144,33 +173,6 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     )
   }
 
-  {logos.length > 0 && <div class="section-divider"><span>PROMEGA</span></div>}
-
-  <!-- References: static logo grid -->
-  {
-    logos.length > 0 && (
-      <section class="section refs">
-        <div class="container">
-          <h2 class="reveal">Referanslar</h2>
-          <div class="logo-grid">
-            {logos.map((l) => (
-              <div class="logo-tile reveal">
-                {l.link ? (
-                  <a href={l.link} target="_blank" rel="noopener" title={l.name}>
-                    <SanityImage image={l.logo} alt={l.name} maxWidth={300} sizes="150px" />
-                  </a>
-                ) : (
-                  <div title={l.name}>
-                    <SanityImage image={l.logo} alt={l.name} maxWidth={300} sizes="150px" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    )
-  }
 </Base>
 
 <style>
@@ -195,6 +197,13 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     letter-spacing: 0.3em;
     color: var(--text-muted);
     flex-shrink: 0;
+  }
+
+  /* Plain hairline divider between sections */
+  .rule {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--border);
   }
 
   /* Two-column split */
@@ -244,7 +253,8 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     align-self: flex-start;
   }
   .btn:hover {
-    background: var(--text);
+    background: var(--accent);
+    border-color: var(--accent);
     color: var(--bg);
   }
 
@@ -263,7 +273,7 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     transition: color 0.25s var(--ease);
   }
   .link-more:hover {
-    color: var(--text);
+    color: var(--accent);
   }
   .proj-grid {
     display: grid;
@@ -335,7 +345,7 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     width: 100%;
     text-align: center;
   }
-  .more-btn:hover { color: var(--text); }
+  .more-btn:hover { color: var(--accent); }
   .bio-dialog {
     max-width: 680px;
     width: calc(100% - 2rem);
@@ -365,53 +375,90 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
   }
   .bio-close:hover { color: var(--text); }
 
-  /* References */
-  .refs h2 {
-    margin-bottom: 2rem;
+  /* References — slow marquee */
+  .refs-marquee {
+    padding-block: clamp(1.6rem, 4vw, 2.6rem);
+    background: #181818;
   }
-  .logo-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+  .refs-label {
+    display: block;
+    text-align: center;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: clamp(1.1rem, 3vw, 1.8rem);
   }
-  .logo-tile {
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: 6px;
+  .marquee {
+    position: relative;
+    overflow: hidden;
+    /* Fade the logos out toward both edges */
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    animation: marquee 45s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  .marquee-item {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.2rem 1.5rem;
-    aspect-ratio: 2 / 1;
-    transition: border-color 0.25s var(--ease);
+    height: 60px;
   }
-  .logo-tile a,
-  .logo-tile > div {
+  .marquee-item a,
+  .marquee-item > div {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
     height: 100%;
   }
-  .logo-tile :global(img) {
-    max-width: 100%;
-    max-height: 56px;
+  .marquee-item :global(img) {
     width: auto;
     height: auto;
+    max-height: 60px;
+    max-width: 170px;
     object-fit: contain;
     filter: grayscale(1) brightness(2);
-    opacity: 0.7;
+    opacity: 0.65;
     transition:
       opacity 0.3s var(--ease),
       filter 0.3s var(--ease);
     background: none !important;
   }
-  .logo-tile:hover {
-    border-color: var(--text-muted);
-  }
-  .logo-tile:hover :global(img) {
+  .marquee-item a:hover :global(img) {
     opacity: 1;
     filter: grayscale(0);
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      /* Track holds two copies; shifting by half loops seamlessly */
+      transform: translateX(calc(-50% - clamp(1.25rem, 3vw, 2.5rem)));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
   }
 
   .muted {
@@ -423,9 +470,6 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
     .proj-grid {
       grid-template-columns: repeat(2, 1fr);
     }
-    .logo-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
   }
   @media (max-width: 900px) {
     .two-col {
@@ -434,9 +478,6 @@ const aboutImage = about.images?.[1] ?? about.images?.[0];
   }
   @media (max-width: 640px) {
     .proj-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .logo-grid {
       grid-template-columns: repeat(2, 1fr);
     }
   }

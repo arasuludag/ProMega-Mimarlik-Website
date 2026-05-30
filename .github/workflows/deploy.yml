@@ -48,7 +48,6 @@ jobs:
           # Active mode bypasses the passive port range problem on this cPanel server.
           lftp -e "
             set ftp:passive-mode true;
-            set ftp:use-epsv false;
             set ftp:ssl-allow false;
             set net:timeout 60;
             set net:max-retries 3;
@@ -58,6 +57,6 @@ jobs:
             set mirror:use-pget-n 4;
             open ftp://185.149.100.26;
             user $FTP_USER $FTP_PASS;
-            mirror --reverse --delete --size-only --verbose=1 --exclude='.ftp-deploy-sync-state.json' ./dist/ /public_html/;
+            mirror --reverse --delete --ignore-time --verbose=1 --exclude='.ftp-deploy-sync-state.json' ./dist/ /public_html/;
             quit
           " 2>&1
